@@ -14,45 +14,27 @@ firebase.initializeApp(firebaseConfig);
 
 var database = firebase.database();
 
-// add a train with the following info:
-/* function addTrain(trainObj) {
-    // string
-    var trainName = trainObj.name;
-    // string
-    var trainDest = trainObj.dest;
-    // convert time to moment object for manipulation/parsing
-    var trainTime = moment(trainObj.time, "HH:mm");
-    // freq is in minutes
-    var trainFreq = trainObj.freq;
-    database.ref("/trains").push(trainObj)
-} */
-
 // calculate when next train arrives
-function nextTrain(trainObj) {
+function nextTrain(trainObj, objString) {
 
     // First Time (pushed back 1 year to make sure it comes before current time)
     var firstTimeConverted = moment(trainObj.time, "hh:mm").subtract(1, "years");
     // get the current time
     var now = moment();
-    // console.log('trainObj:')
-    // console.log(trainObj)
     // turn the departure frequency into an integer for later math
     var arrivalFreq = parseInt(trainObj.freq);
-    // console.log('arrival Frequency: ' + arrivalFreq);
-    // console.log('trainObj.time ' + trainObj.time)
     // calculate how many minutes have passed from the first departure time until now
     var minutesSinceInitialDepart = now.diff(moment(firstTimeConverted), 'minutes');
-    // console.log('total minutes since initial departure:' + minutesSinceInitialDepart);
     // use modulo to find out how many minutes have elapsed since the last departure
     var minutesUntilNextDepart = minutesSinceInitialDepart % arrivalFreq;
     // subtract that from the departure frequency to find out how many minutes left until the next departure
     var minutesAway = arrivalFreq - minutesUntilNextDepart;
-    // console.log('minutes away until the next train: ' + minutesAway);
     // add that number to the current time to find out when the next departure time is
     var nextDepartureTime = now.add(minutesAway, 'm');
 
     //add a table row for this train
     var row = $('<tr>');
+    row.attr('id', objString);
     var tName = $('<td>');
     tName.text(trainObj.name);
     row.append(tName);
@@ -68,17 +50,33 @@ function nextTrain(trainObj) {
     var tMinAway = $('<td>');
     tMinAway.text(minutesAway);
     row.append(tMinAway);
+    var tEdit = $('<td>');
+    var tEditBtn = $('<btn>');
+    tEditBtn.addClass('btn btn-info editTrain');
+    tEditBtn.attr('data-id', objString);
+    tEditBtn.text('?');
+    tEdit.append(tEditBtn);
+    row.append(tEdit);
+    var tDel = $('<td>')
+    var tDelBtn = $('<btn>');
+    tDelBtn.addClass('btn btn-danger deleteTrain');
+    tDelBtn.attr('data-id', objString);
+    tDelBtn.text('X');
+    tDel.append(tDelBtn);
+    row.append(tDel);
     $('#train-table-body').append(row);
 }
 
+// loop through train objects in Firebase
 function checkTrains(snapshot) {
     var trains = snapshot.val();
-    for (var savedTrainObj in trains) {
-        var thisTrainObj = snapshot.child(savedTrainObj).val()
-        nextTrain(thisTrainObj)
+    for (var savedTrainString in trains) {
+        var thisTrainObj = snapshot.child(savedTrainString).val()
+        nextTrain(thisTrainObj, savedTrainString)
     }
 }
 
+// a one time check/rerender
 function checkOnce() {
     $('#train-table-body').empty();
     database.ref("/trains").once('value', function(snapshot){
@@ -109,3 +107,10 @@ $("#submit-train").on('click', function(e) {
     database.ref("/trains").push(trainObj)
 })
 
+// delete a train
+$(document).on('click', '.deleteTrain', function(e){
+    e.preventDefault();
+    var node = $(this).attr('data-id');
+    database.ref('/trains').child(node).remove();
+    checkOnce();
+})
