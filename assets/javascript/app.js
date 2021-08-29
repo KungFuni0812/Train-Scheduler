@@ -29,23 +29,26 @@ var database = firebase.database();
 
 // calculate when next train arrives
 function nextTrain(trainObj) {
-    // calculate how many minutes have passed since the first departure
-    // modulo of (minutes passed) % freq
-    // use moment to display how many time between now and # of minutes
 
     // First Time (pushed back 1 year to make sure it comes before current time)
     var firstTimeConverted = moment(trainObj.time, "hh:mm").subtract(1, "years");
+    // get the current time
     var now = moment();
-    console.log('trainObj:')
-    console.log(trainObj)
+    // console.log('trainObj:')
+    // console.log(trainObj)
+    // turn the departure frequency into an integer for later math
     var arrivalFreq = parseInt(trainObj.freq);
-    console.log('arrival Frequency: ' + arrivalFreq);
-    console.log('trainObj.time ' + trainObj.time)
+    // console.log('arrival Frequency: ' + arrivalFreq);
+    // console.log('trainObj.time ' + trainObj.time)
+    // calculate how many minutes have passed from the first departure time until now
     var minutesSinceInitialDepart = now.diff(moment(firstTimeConverted), 'minutes');
-    console.log('total minutes since initial departure:' + minutesSinceInitialDepart);
+    // console.log('total minutes since initial departure:' + minutesSinceInitialDepart);
+    // use modulo to find out how many minutes have elapsed since the last departure
     var minutesUntilNextDepart = minutesSinceInitialDepart % arrivalFreq;
+    // subtract that from the departure frequency to find out how many minutes left until the next departure
     var minutesAway = arrivalFreq - minutesUntilNextDepart;
-    console.log('minutes away until the next train: ' + minutesAway);
+    // console.log('minutes away until the next train: ' + minutesAway);
+    // add that number to the current time to find out when the next departure time is
     var nextDepartureTime = now.add(minutesAway, 'm');
 
     //add a table row for this train
@@ -68,6 +71,30 @@ function nextTrain(trainObj) {
     $('#train-table-body').append(row);
 }
 
+function checkTrains(snapshot) {
+    var trains = snapshot.val();
+    for (var savedTrainObj in trains) {
+        var thisTrainObj = snapshot.child(savedTrainObj).val()
+        nextTrain(thisTrainObj)
+    }
+}
+
+function checkOnce() {
+    $('#train-table-body').empty();
+    database.ref("/trains").once('value', function(snapshot){
+        checkTrains(snapshot)
+    })
+}
+
+// check database and render train rows on load
+database.ref("/trains").on("value", function(snapshot){
+    checkTrains(snapshot);
+})
+
+// re-render the train rows every 1 minute
+setInterval(checkOnce, 60000);
+
+// add a train when Submit is clicked
 $("#submit-train").on('click', function(e) {
     e.preventDefault();
     // grab inputs
@@ -77,7 +104,8 @@ $("#submit-train").on('click', function(e) {
         time: $("#fttime").val().trim(),
         freq: $("#freq").val().trim()
     }
+    $('#train-table-body').empty();
     // add to firebase and render to page
-    // database.ref("/trains").push(trainObj)
-    nextTrain(trainObj);
+    database.ref("/trains").push(trainObj)
 })
+
