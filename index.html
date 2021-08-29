@@ -29,9 +29,10 @@
 <!-- Jumbotron Title -->
 <div class="jumbotron">
     <h1 class="text-center">Anytime is Train Time</h1>
-    <h4 class="text-center">Choo Choo. Chee Chee.</h4>
+    <h4 class="text-center">Choo Choo!</h4>
 </div>
 
+<!-- Train Title -->
 <div class="row">
     <div class="col-lg-12">
     <div class="card">
@@ -42,7 +43,7 @@
     </div>
 </div>
 
-<!-- Current Product -->
+<!-- Current Trian Schedule -->
 <div class="row">
     <div class="col-lg-12">
     <div class="card">
@@ -58,47 +59,7 @@
                         <th scope="col">Minutes Away</th>
                     </tr>
                 </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                    <tbody id="train-table-body">
                     </tbody>
             </table>
         </div>
@@ -107,7 +68,7 @@
     </div>
 </div>
 
-<!-- Make Your Bid -->
+<!-- Adding Train -->
 <div class="row">
     <div class="col-lg-12">
     <div class="card">
@@ -118,19 +79,19 @@
         <form>
             <div class="form-group row">
                 <label for="Train-Name">Train Name</label>
-                <input class="form-control" id="Tname" type="text">
+                <input class="form-control" id="tname" type="text">
             </div>
             <div class="form-group row">
                 <label for="Destination">Destination</label>
-                <input class="form-control" id="Dsnation" type="text">
+                <input class="form-control" id="dsnation" type="text">
             </div>
             <div class="form-group row">
                 <label for="First-Train-Time">First Train Time (HH:mm - military time)</label>
-                <input class="form-control" id="FTtime" type="text">
+                <input class="form-control" id="fttime" type="text">
             </div>
             <div class="form-group row">
                 <label for="Frequency">Frequency (min)</label>
-                <input class="form-control" id="Freq" type="text">
+                <input class="form-control" id="freq" type="text">
             </div>
             <button class="btn btn-primary" id="submit-train" type="submit">Submit</button>
         </form>
@@ -143,7 +104,8 @@
 </div>
 
 <!-- JavaScript -->
-<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+<script src="./assets/javascript/app.js"></script>
 
 </body>
 
